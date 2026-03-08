@@ -541,7 +541,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-screen overflow-hidden text-text-primary">
       <OfflineBanner />
-      {/* Animated gradient blobs for glassmorphism effect */}
+      {/* Subtle background pattern */}
       <div className="animated-bg" aria-hidden="true">
         <div className="blob" />
         <div className="blob" />

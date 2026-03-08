@@ -1102,12 +1102,12 @@ export const HELP_CATEGORIES: HelpCategory[] = [
         title: "Light & dark mode",
         summary: "Switch between light, dark, or system theme.",
         description:
-          "Choose between light mode, dark mode, or system-matched (follows your OS setting). Dark mode uses carefully chosen colors for comfortable reading in low-light environments, with a darker background and softer text. The theme switches instantly and persists across restarts. The animated gradient background also adapts — light mode uses blues/purples/pinks, dark mode uses deeper blues and purples.",
+          "Choose between light mode, dark mode, or system-matched (follows your OS setting). Dark mode uses carefully chosen colors for comfortable reading in low-light environments, with a darker background and softer text. The theme switches instantly and persists across restarts.",
         tips: [
           { text: "Change theme in Settings > General." },
           { text: "\"System\" follows your OS light/dark preference." },
           { text: "Dark mode is optimized for low-light environments." },
-          { text: "The animated background gradient adapts to light/dark mode." },
+          { text: "Clean, professional interface design." },
         ],
         relatedSettingsTab: "general",
       },
