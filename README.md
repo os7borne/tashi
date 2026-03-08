@@ -40,6 +40,16 @@ Most email clients are slow, bloated, or send your data to someone else's server
 - **Native performance** -- Rust backend via Tauri v2. Small binary, low memory, instant startup.
 - **Private by default** -- Remote images blocked, HTML sanitized, emails rendered in sandboxed iframes. Your data stays on your machine.
 
+### Tashi vs Velo
+
+Tashi is a fork of [Velo](https://github.com/avihaymenahem/velo) with a focus on a cleaner, more professional aesthetic:
+
+| | Velo | Tashi |
+|--|------|-------|
+| **Design** | Glassmorphism with animated gradients | Clean, professional flat design |
+| **Background** | Animated gradient blobs | Solid colors with subtle dot pattern |
+| **Visual Style** | Playful, colorful | Minimal, focused |
+
 ---
 
 ## Features
@@ -140,6 +150,10 @@ For developers who want to build Tashi themselves or contribute:
 ```bash
 git clone https://github.com/os7borne/tashi.git
 cd tashi
+
+# IMPORTANT: Checkout the tashi branch for the branded version
+git checkout tashi
+
 npm install
 npm run tauri dev
 ```
@@ -147,6 +161,40 @@ npm run tauri dev
 **Prerequisites:** [Node.js](https://nodejs.org/) v18+, [Rust](https://www.rust-lang.org/tools/install), [Tauri v2 deps](https://v2.tauri.app/start/prerequisites/)
 
 See [Development Guide](docs/development.md) for all commands, testing, and build instructions.
+
+### Branch Structure
+
+This repository uses a dual-branch strategy:
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Clean sync with original [Velo](https://github.com/avihaymenahem/velo) repo |
+| `tashi` | **Custom branded version** with Tashi UI and features |
+
+**Always work on the `tashi` branch** to get the branded version. The `main` branch is kept clean for syncing with upstream.
+
+### Syncing with Original Velo Updates
+
+To get the latest features and fixes from the original Velo developer:
+
+```bash
+# Add upstream remote (one-time setup)
+git remote add upstream https://github.com/avihaymenahem/velo.git
+
+# Fetch latest updates
+git checkout main
+git pull upstream main
+
+# Push to your fork
+git push origin main
+
+# Merge into your tashi branch
+git checkout tashi
+git merge main
+
+# Resolve any conflicts, then push
+git push origin tashi
+```
 
 ---
 
