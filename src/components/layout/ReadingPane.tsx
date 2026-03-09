@@ -94,9 +94,9 @@ export function ReadingPane() {
 }
 
 // Simple person sidebar component
-function PersonSidebar({ thread }: { thread: { from_name?: string | null; from_address?: string | null } }) {
-  const name = thread.from_name || thread.from_address || "Unknown";
-  const email = thread.from_address || "";
+function PersonSidebar({ thread }: { thread: { fromName?: string | null; fromAddress?: string | null } }) {
+  const name = thread.fromName || thread.fromAddress || "Unknown";
+  const email = thread.fromAddress || "";
 
   return (
     <div className="p-4">
