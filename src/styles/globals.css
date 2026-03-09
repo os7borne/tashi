@@ -55,9 +55,9 @@
   --color-border-primary: rgba(255, 255, 255, 0.08);
   --color-border-secondary: rgba(255, 255, 255, 0.04);
 
-  --color-accent: #e5e5e5;
-  --color-accent-hover: #ffffff;
-  --color-accent-light: #404040;
+  --color-accent: #0049C7;
+  --color-accent-hover: #0066FF;
+  --color-accent-light: rgba(0, 73, 199, 0.15);
 
   --color-sidebar-bg: rgba(10, 10, 10, 0.95);
   --color-sidebar-text: #fafafa;
