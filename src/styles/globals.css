@@ -42,11 +42,13 @@
  * Dark mode overrides — applied when <html class="dark">
  */
 .dark {
-  --color-bg-primary: rgba(10, 10, 10, 0.95);
-  --color-bg-secondary: rgba(18, 18, 18, 0.92);
-  --color-bg-tertiary: rgba(28, 28, 28, 0.88);
-  --color-bg-hover: rgba(38, 38, 38, 0.7);
-  --color-bg-selected: rgba(45, 45, 45, 0.85);
+  /* Layered dark theme - three distinct shades for columns */
+  /* Sidebar (folders): darkest | Email list: medium | Reading pane: lightest */
+  --color-bg-primary: rgba(26, 26, 26, 0.95);      /* Reading pane - #1a1a1a */
+  --color-bg-secondary: rgba(20, 20, 20, 0.92);    /* Email list - #141414 */
+  --color-bg-tertiary: rgba(28, 28, 28, 0.88);     /* Elevated elements */
+  --color-bg-hover: rgba(45, 45, 45, 0.7);
+  --color-bg-selected: rgba(0, 73, 199, 0.25);     /* Blue tinted selection */
 
   --color-text-primary: #fafafa;
   --color-text-secondary: #a3a3a3;
@@ -59,9 +61,10 @@
   --color-accent-hover: #0066FF;
   --color-accent-light: rgba(0, 73, 199, 0.15);
 
-  --color-sidebar-bg: rgba(10, 10, 10, 0.95);
+  /* Sidebar - darkest column (#0d0d0d) */
+  --color-sidebar-bg: rgba(13, 13, 13, 0.98);
   --color-sidebar-text: #fafafa;
-  --color-sidebar-hover: rgba(38, 38, 38, 0.8);
+  --color-sidebar-hover: rgba(35, 35, 35, 0.8);
 
   --glass-border: rgba(255, 255, 255, 0.06);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
