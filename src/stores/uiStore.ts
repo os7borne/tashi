@@ -59,6 +59,8 @@ interface UIState {
   setOnline: (online: boolean) => void;
   setPendingOpsCount: (count: number) => void;
   setSyncingFolder: (folder: string | null) => void;
+  isSyncing: boolean;
+  setIsSyncing: (syncing: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({

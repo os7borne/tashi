@@ -383,7 +383,7 @@ export default function App() {
   // Listen for sync status updates
   const backfillDoneRef = useRef(false);
   useEffect(() => {
-    const unsub = onSyncStatus((accountId, status, _progress, error) => {
+    const unsub = onSyncStatus((accountId, status) => {
       if (status === "syncing") {
         setIsSyncing(true);
       } else if (status === "done") {
