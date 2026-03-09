@@ -157,15 +157,18 @@ export default function App() {
       const detail = (e as CustomEvent<{ threadIds: string[] }>).detail;
       setMoveToFolderState({ open: true, threadIds: detail.threadIds });
     };
+    const handleShowAddAccount = () => setShowAddAccount(true);
     window.addEventListener("velo-toggle-command-palette", togglePalette);
     window.addEventListener("velo-toggle-shortcuts-help", toggleHelp);
     window.addEventListener("velo-toggle-ask-inbox", toggleAskInbox);
     window.addEventListener("velo-move-to-folder", handleMoveToFolder);
+    window.addEventListener("velo-show-add-account", handleShowAddAccount);
     return () => {
       window.removeEventListener("velo-toggle-command-palette", togglePalette);
       window.removeEventListener("velo-toggle-shortcuts-help", toggleHelp);
       window.removeEventListener("velo-toggle-ask-inbox", toggleAskInbox);
       window.removeEventListener("velo-move-to-folder", handleMoveToFolder);
+      window.removeEventListener("velo-show-add-account", handleShowAddAccount);
     };
   }, []);
 
