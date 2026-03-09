@@ -1247,12 +1247,15 @@ export function SettingsPage() {
                             onClick={async () => {
                               setAiTesting(true);
                               setAiTestResult(null);
+                              setAiTestError("");
                               try {
                                 const { testConnection } = await import("@/services/ai/aiService");
                                 const ok = await testConnection();
                                 setAiTestResult(ok ? "success" : "fail");
-                              } catch {
+                              } catch (err) {
                                 setAiTestResult("fail");
+                                const message = err instanceof Error ? err.message : String(err);
+                                setAiTestError(message);
                               } finally {
                                 setAiTesting(false);
                               }
