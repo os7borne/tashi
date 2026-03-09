@@ -59,6 +59,7 @@ export function EmailList({ width, listRef }: { width?: number; listRef?: React.
   const readFilter = useUIStore((s) => s.readFilter);
   const setReadFilter = useUIStore((s) => s.setReadFilter);
   const readingPanePosition = useUIStore((s) => s.readingPanePosition);
+  const setReadingPaneOpen = useUIStore((s) => s.setReadingPaneOpen);
   const userLabels = useLabelStore((s) => s.labels);
   const smartFolders = useSmartFolderStore((s) => s.folders);
 
@@ -147,8 +148,9 @@ export function EmailList({ width, listRef }: { width?: number; listRef?: React.
       handleDraftClick(thread);
     } else {
       navigateToThread(thread.id);
+      setReadingPaneOpen(true);
     }
-  }, [activeLabel, handleDraftClick]);
+  }, [activeLabel, handleDraftClick, setReadingPaneOpen]);
 
   const handleBulkDelete = async () => {
     if (!activeAccountId || multiSelectCount === 0) return;

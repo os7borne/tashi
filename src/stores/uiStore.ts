@@ -61,6 +61,8 @@ interface UIState {
   setSyncingFolder: (folder: string | null) => void;
   isSyncing: boolean;
   setIsSyncing: (syncing: boolean) => void;
+  isReadingPaneOpen: boolean;
+  setReadingPaneOpen: (open: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -84,6 +86,7 @@ export const useUIStore = create<UIState>((set) => ({
   pendingOpsCount: 0,
   isSyncingFolder: null,
   isSyncing: false,
+  isReadingPaneOpen: false,
 
   setTheme: (theme) => set({ theme }),
   toggleSidebar: () =>
@@ -160,4 +163,5 @@ export const useUIStore = create<UIState>((set) => ({
   setPendingOpsCount: (pendingOpsCount) => set({ pendingOpsCount }),
   setSyncingFolder: (isSyncingFolder) => set({ isSyncingFolder }),
   setIsSyncing: (isSyncing) => set({ isSyncing }),
+  setReadingPaneOpen: (isReadingPaneOpen) => set({ isReadingPaneOpen }),
 }));
