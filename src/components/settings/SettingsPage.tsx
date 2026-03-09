@@ -1840,6 +1840,7 @@ function ShortcutsTab() {
   const [composeShortcut, setComposeShortcut] = useState(DEFAULT_SHORTCUT);
   const [recordingGlobal, setRecordingGlobal] = useState(false);
   const globalRecorderRef = useRef<HTMLButtonElement | null>(null);
+  const recorderRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   useEffect(() => {
     const current = getCurrentShortcut();
@@ -1954,14 +1955,33 @@ function ShortcutsTab() {
                   </span>
                   <div className="flex items-center gap-2 ml-4 shrink-0">
                     <button
-                      onClick={() => setRecordingId(isRecording ? null : item.id)}
+                      ref={(el) => {
+                        if (el) recorderRefs.current.set(item.id, el);
+                      }}
+                      onClick={() => {
+                        const newRecordingId = isRecording ? null : item.id;
+                        setRecordingId(newRecordingId);
+                        // Auto-focus the button when starting recording
+                        if (newRecordingId) {
+                          setTimeout(() => {
+                            recorderRefs.current.get(item.id)?.focus();
+                          }, 0);
+                        }
+                      }}
                       onKeyDown={(e) => {
                         if (isRecording) handleKeyRecord(e, item.id);
                       }}
-                      onBlur={() => { if (isRecording) setRecordingId(null); }}
-                      className={`text-xs px-2.5 py-1 rounded-md font-mono transition-colors ${
+                      onBlur={() => { 
+                        // Small delay to allow keydown to process first
+                        setTimeout(() => {
+                          if (recordingId === item.id) {
+                            setRecordingId(null);
+                          }
+                        }, 200);
+                      }}
+                      className={`text-xs px-2.5 py-1 rounded-md font-mono transition-colors outline-none focus:ring-2 focus:ring-accent/50 ${
                         isRecording
-                          ? "bg-accent text-white"
+                          ? "bg-accent text-white ring-2 ring-accent/50"
                           : "bg-bg-tertiary text-text-tertiary hover:text-text-primary border border-border-primary"
                       }`}
                     >
