@@ -81,6 +81,7 @@ export const useUIStore = create<UIState>((set) => ({
   isOnline: true,
   pendingOpsCount: 0,
   isSyncingFolder: null,
+  isSyncing: false,
 
   setTheme: (theme) => set({ theme }),
   toggleSidebar: () =>
@@ -156,4 +157,5 @@ export const useUIStore = create<UIState>((set) => ({
   setOnline: (isOnline) => set({ isOnline }),
   setPendingOpsCount: (pendingOpsCount) => set({ pendingOpsCount }),
   setSyncingFolder: (isSyncingFolder) => set({ isSyncingFolder }),
+  setIsSyncing: (isSyncing) => set({ isSyncing }),
 }));

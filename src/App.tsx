@@ -102,7 +102,7 @@ export default function App() {
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [initialized, setInitialized] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const setIsSyncing = useUIStore((s) => s.setIsSyncing);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [showAskInbox, setShowAskInbox] = useState(false);
@@ -383,23 +383,11 @@ export default function App() {
   // Listen for sync status updates
   const backfillDoneRef = useRef(false);
   useEffect(() => {
-    const unsub = onSyncStatus((accountId, status, progress, error) => {
+    const unsub = onSyncStatus((accountId, status, _progress, error) => {
       if (status === "syncing") {
-        if (progress) {
-          if (progress.phase === "messages") {
-            setSyncStatus(
-              `Syncing: ${progress.current}/${progress.total} messages`,
-            );
-          } else if (progress.phase === "labels") {
-            setSyncStatus("Syncing labels...");
-          } else if (progress.phase === "threads") {
-            setSyncStatus(`Building threads... (${progress.current}/${progress.total})`);
-          }
-        } else {
-          setSyncStatus("Syncing...");
-        }
+        setIsSyncing(true);
       } else if (status === "done") {
-        setSyncStatus(null);
+        setIsSyncing(false);
         window.dispatchEvent(new Event("velo-sync-done"));
         updateBadgeCount();
 
@@ -411,15 +399,13 @@ export default function App() {
             .catch((err) => console.error("Backfill error:", err));
         }
       } else if (status === "error") {
-        setSyncStatus(error ? `Sync failed: ${formatSyncError(error)}` : "Sync failed");
+        setIsSyncing(false);
         // Still dispatch sync-done so the UI refreshes with any partially stored data
         window.dispatchEvent(new Event("velo-sync-done"));
-        // Auto-clear the error after 8 seconds
-        setTimeout(() => setSyncStatus(null), 8_000);
       }
     });
     return unsub;
-  }, []);
+  }, [setIsSyncing]);
 
   // Sync theme class to <html> element
   useEffect(() => {
@@ -561,13 +547,6 @@ export default function App() {
           <Outlet />
         </DndProvider>
       </div>
-
-      {/* Sync status bar */}
-      {syncStatus && (
-        <div className={`fixed bottom-0 left-0 right-0 glass-panel text-white text-xs px-4 py-1.5 text-center z-40 ${syncStatus.startsWith("Sync failed") ? "bg-danger/90" : "bg-accent/90"}`}>
-          {syncStatus}
-        </div>
-      )}
 
       {showAddAccount && (
         <AddAccount

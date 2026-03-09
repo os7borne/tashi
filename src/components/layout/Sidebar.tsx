@@ -656,9 +656,32 @@ export function Sidebar({ collapsed, onAddAccount }: SidebarProps) {
         ]}
       />
 
+      {/* Sync indicator - subtle spinner */}
+      <SyncIndicator collapsed={collapsed} />
+
       {/* Pending operations indicator */}
       <PendingOpsIndicator collapsed={collapsed} />
     </aside>
+  );
+}
+
+function SyncIndicator({ collapsed }: { collapsed: boolean }) {
+  const isSyncing = useUIStore((s) => s.isSyncing);
+  if (!isSyncing) return null;
+
+  return (
+    <div className="px-3 py-1.5 border-t border-border-primary/50">
+      {collapsed ? (
+        <div className="flex justify-center">
+          <Loader2 size={14} className="text-accent/60 animate-spin" />
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 text-xs text-text-tertiary">
+          <Loader2 size={12} className="text-accent/60 animate-spin" />
+          <span>Syncing...</span>
+        </div>
+      )}
+    </div>
   );
 }
 
