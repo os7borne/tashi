@@ -489,10 +489,10 @@ export function EmailList({ width, listRef }: { width?: number; listRef?: React.
       ref={listRef}
       className={`flex flex-col bg-bg-secondary glass-panel ${
         readingPanePosition === "right"
-          ? "min-w-[240px] shrink-0"
+          ? "min-w-[240px] shrink-0 h-full"
           : readingPanePosition === "bottom"
             ? "w-full border-b border-border-primary h-[40%] min-h-[200px]"
-            : "w-full flex-1"
+            : "w-full flex-1 h-full"
       }`}
       style={readingPanePosition === "right" && width ? { width } : undefined}
     >

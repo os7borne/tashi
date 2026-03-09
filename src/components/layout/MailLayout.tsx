@@ -1,12 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EmailList } from "./EmailList";
 import { ReadingPane } from "./ReadingPane";
+import { Sidebar } from "./Sidebar";
 import { useUIStore } from "@/stores/uiStore";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 export function MailLayout() {
   const isReadingPaneOpen = useUIStore((s) => s.isReadingPaneOpen);
   const setReadingPaneOpen = useUIStore((s) => s.setReadingPaneOpen);
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
+  const [showAddAccount, setShowAddAccount] = useState(false);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -23,11 +26,12 @@ export function MailLayout() {
   }, [isReadingPaneOpen, setReadingPaneOpen]);
 
   return (
-    <div className="flex flex-1 min-w-0 flex-row">
-      {/* Left column: Always Sidebar */}
+    <div className="flex flex-1 min-w-0 flex-row h-full">
+      {/* Left column: Sidebar */}
+      <Sidebar collapsed={sidebarCollapsed} onAddAccount={() => setShowAddAccount(true)} />
       
       {/* Right column: EmailList OR ReadingPane */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 h-full">
         <ErrorBoundary name="EmailLayout">
           {isReadingPaneOpen ? (
             <ReadingPane />
