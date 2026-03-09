@@ -239,7 +239,8 @@ export async function testConnection(): Promise<boolean> {
   try {
     const provider = await getActiveProvider();
     return await provider.testConnection();
-  } catch {
-    return false;
+  } catch (err) {
+    console.error("AI test connection failed:", err);
+    throw err;
   }
 }

@@ -129,6 +129,7 @@ export function SettingsPage() {
   const [aiKeySaved, setAiKeySaved] = useState(false);
   const [aiTesting, setAiTesting] = useState(false);
   const [aiTestResult, setAiTestResult] = useState<"success" | "fail" | null>(null);
+  const [aiTestError, setAiTestError] = useState<string>("");
   const [aiAutoDraftEnabled, setAiAutoDraftEnabled] = useState(true);
   const [aiWritingStyleEnabled, setAiWritingStyleEnabled] = useState(true);
   const [styleAnalyzing, setStyleAnalyzing] = useState(false);
@@ -1111,12 +1112,15 @@ export function SettingsPage() {
                             onClick={async () => {
                               setAiTesting(true);
                               setAiTestResult(null);
+                              setAiTestError("");
                               try {
                                 const { testConnection } = await import("@/services/ai/aiService");
                                 const ok = await testConnection();
                                 setAiTestResult(ok ? "success" : "fail");
-                              } catch {
+                              } catch (err) {
                                 setAiTestResult("fail");
+                                const message = err instanceof Error ? err.message : String(err);
+                                setAiTestError(message);
                               } finally {
                                 setAiTesting(false);
                               }
@@ -1130,7 +1134,14 @@ export function SettingsPage() {
                             <span className="text-xs text-success">Connected!</span>
                           )}
                           {aiTestResult === "fail" && (
-                            <span className="text-xs text-danger">Connection failed</span>
+                            <div className="flex flex-col">
+                              <span className="text-xs text-danger">Connection failed</span>
+                              {aiTestError && (
+                                <span className="text-xs text-text-tertiary mt-1 max-w-[200px] truncate" title={aiTestError}>
+                                  {aiTestError}
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>

@@ -25,10 +25,13 @@ export function createGeminiProvider(apiKey: string, modelId: string): AiProvide
         const model = client.getGenerativeModel({
           model: modelId,
         });
-        await model.generateContent("Say hi");
+        const result = await model.generateContent("Say hi");
+        // Force the response to ensure the API call completes
+        await result.response.text();
         return true;
-      } catch {
-        return false;
+      } catch (err) {
+        console.error("Gemini connection test failed:", err);
+        throw err;
       }
     },
   };
