@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import App from "@/App";
 import { MailLayout } from "@/components/layout/MailLayout";
+import { PageLayout } from "@/components/layout/PageLayout";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 // Lazy-load heavy pages — these include many sub-components and service imports
@@ -60,31 +61,37 @@ function MailPage() {
 
 function SettingsTabPage() {
   return (
-    <ErrorBoundary name="SettingsPage">
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading settings...</div>}>
-        <SettingsPage />
-      </Suspense>
-    </ErrorBoundary>
+    <PageLayout>
+      <ErrorBoundary name="SettingsPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading settings...</div>}>
+          <SettingsPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }
 
 function CalendarPageWrapper() {
   return (
-    <ErrorBoundary name="CalendarPage">
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading calendar...</div>}>
-        <CalendarPage />
-      </Suspense>
-    </ErrorBoundary>
+    <PageLayout>
+      <ErrorBoundary name="CalendarPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading calendar...</div>}>
+          <CalendarPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }
 
 function HelpPageWrapper() {
   return (
-    <ErrorBoundary name="HelpPage">
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading help...</div>}>
-        <HelpPage />
-      </Suspense>
-    </ErrorBoundary>
+    <PageLayout>
+      <ErrorBoundary name="HelpPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading help...</div>}>
+          <HelpPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }
 
@@ -149,11 +156,13 @@ export const settingsTabRoute = createRoute({
 // ---------- /attachments ----------
 function AttachmentLibraryWrapper() {
   return (
-    <ErrorBoundary name="AttachmentLibrary">
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading attachments...</div>}>
-        <AttachmentLibrary />
-      </Suspense>
-    </ErrorBoundary>
+    <PageLayout>
+      <ErrorBoundary name="AttachmentLibrary">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading attachments...</div>}>
+          <AttachmentLibrary />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }
 
@@ -166,11 +175,13 @@ export const attachmentsRoute = createRoute({
 // ---------- /tasks ----------
 function TasksPageWrapper() {
   return (
-    <ErrorBoundary name="TasksPage">
-      <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading tasks...</div>}>
-        <TasksPage />
-      </Suspense>
-    </ErrorBoundary>
+    <PageLayout>
+      <ErrorBoundary name="TasksPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading tasks...</div>}>
+          <TasksPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
   );
 }
 

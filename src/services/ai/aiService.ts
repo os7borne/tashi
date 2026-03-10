@@ -1,5 +1,6 @@
 import { getActiveProvider } from "./providerManager";
 import { getAiCache, setAiCache } from "@/services/db/aiCache";
+import { getSetting } from "@/services/db/settings";
 import { AiError } from "./errors";
 import type { DbMessage } from "@/services/db/messages";
 import {
@@ -19,7 +20,18 @@ import {
 async function callAi(systemPrompt: string, userContent: string): Promise<string> {
   try {
     const provider = await getActiveProvider();
-    return await provider.complete({ systemPrompt, userContent });
+    
+    // Prepend custom system prompt if enabled
+    const useCustom = await getSetting("ai_use_custom_prompt");
+    let finalSystemPrompt = systemPrompt;
+    if (useCustom === "true") {
+      const customPrompt = await getSetting("ai_custom_system_prompt");
+      if (customPrompt?.trim()) {
+        finalSystemPrompt = `${customPrompt.trim()}\n\n${systemPrompt}`;
+      }
+    }
+    
+    return await provider.complete({ systemPrompt: finalSystemPrompt, userContent });
   } catch (err) {
     if (err instanceof AiError) throw err;
     const message = err instanceof Error ? err.message : String(err);

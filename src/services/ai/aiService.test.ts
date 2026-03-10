@@ -14,6 +14,10 @@ vi.mock("@/services/db/aiCache", () => ({
   setAiCache: vi.fn(),
 }));
 
+vi.mock("@/services/db/settings", () => ({
+  getSetting: vi.fn(() => Promise.resolve(null)),
+}));
+
 import { classifyThreadsBySmartLabels } from "./aiService";
 
 describe("classifyThreadsBySmartLabels", () => {

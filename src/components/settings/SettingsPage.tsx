@@ -134,6 +134,8 @@ export function SettingsPage() {
   const [aiWritingStyleEnabled, setAiWritingStyleEnabled] = useState(true);
   const [styleAnalyzing, setStyleAnalyzing] = useState(false);
   const [styleAnalyzeDone, setStyleAnalyzeDone] = useState(false);
+  const [useCustomPrompt, setUseCustomPrompt] = useState(false);
+  const [customSystemPrompt, setCustomSystemPrompt] = useState("");
   const [cacheMaxMb, setCacheMaxMb] = useState("500");
   const [cacheSizeMb, setCacheSizeMb] = useState<number | null>(null);
   const [clearingCache, setClearingCache] = useState(false);
@@ -206,6 +208,12 @@ export function SettingsPage() {
       setAiAutoDraftEnabled(aiDraft !== "false");
       const aiStyle = await getSetting("ai_writing_style_enabled");
       setAiWritingStyleEnabled(aiStyle !== "false");
+
+      // Load custom system prompt settings
+      const useCustom = await getSetting("ai_use_custom_prompt");
+      setUseCustomPrompt(useCustom === "true");
+      const customPrompt = await getSetting("ai_custom_system_prompt");
+      setCustomSystemPrompt(customPrompt ?? "");
 
       // Load auto-archive categories
       const autoArchive = await getSetting("auto_archive_categories");
@@ -1312,6 +1320,36 @@ export function SettingsPage() {
                         await setSetting("ai_auto_summarize", newVal ? "true" : "false");
                       }}
                     />
+                  </Section>
+
+                  <Section title="Custom System Prompt">
+                    <ToggleRow
+                      label="Use custom system prompt"
+                      description="Add your own instructions to customize AI behavior across all features"
+                      checked={useCustomPrompt}
+                      onToggle={async () => {
+                        const newVal = !useCustomPrompt;
+                        setUseCustomPrompt(newVal);
+                        await setSetting("ai_use_custom_prompt", newVal ? "true" : "false");
+                      }}
+                    />
+                    {useCustomPrompt && (
+                      <div className="mt-3">
+                        <textarea
+                          value={customSystemPrompt}
+                          onChange={async (e) => {
+                            const value = e.target.value;
+                            setCustomSystemPrompt(value);
+                            await setSetting("ai_custom_system_prompt", value);
+                          }}
+                          placeholder="e.g., You are a helpful assistant. Always be concise and professional. Avoid jargon."
+                          className="w-full h-32 bg-bg-tertiary text-text-primary text-sm p-3 rounded-md border border-border-primary focus:border-accent outline-none resize-none font-mono"
+                        />
+                        <p className="text-xs text-text-tertiary mt-2">
+                          This prompt is prepended to all AI requests. Use it to define your preferred tone, style, or persona.
+                        </p>
+                      </div>
+                    )}
                   </Section>
 
                   <Section title="Auto-Draft Replies">

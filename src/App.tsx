@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Outlet } from "@tanstack/react-router";
-import { Sidebar } from "./components/layout/Sidebar";
 import { AddAccount } from "./components/accounts/AddAccount";
 import { Composer } from "./components/composer/Composer";
 import { UndoSendToast } from "./components/composer/UndoSendToast";
@@ -99,7 +98,6 @@ export default function App() {
   const fontScale = useUIStore((s) => s.fontScale);
   const colorTheme = useUIStore((s) => s.colorTheme);
   const reduceMotion = useUIStore((s) => s.reduceMotion);
-  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [initialized, setInitialized] = useState(false);
   const setIsSyncing = useUIStore((s) => s.setIsSyncing);
@@ -541,12 +539,6 @@ export default function App() {
       <TitleBar />
       <div className="flex flex-1 min-w-0 overflow-hidden">
         <DndProvider>
-          <ErrorBoundary name="Sidebar">
-            <Sidebar
-              collapsed={sidebarCollapsed}
-              onAddAccount={() => setShowAddAccount(true)}
-            />
-          </ErrorBoundary>
           <Outlet />
         </DndProvider>
       </div>
