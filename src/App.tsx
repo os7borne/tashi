@@ -100,6 +100,7 @@ export default function App() {
   const reduceMotion = useUIStore((s) => s.reduceMotion);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const setIsSyncing = useUIStore((s) => s.setIsSyncing);
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
@@ -388,6 +389,8 @@ export default function App() {
       if (status === "syncing") {
         setIsSyncing(true);
       } else if (status === "done") {
+        setSyncStatus("Sync complete");
+        setTimeout(() => setSyncStatus(null), 2_000);
         setIsSyncing(false);
         window.dispatchEvent(new Event("velo-sync-done"));
         updateBadgeCount();
@@ -543,6 +546,16 @@ export default function App() {
         </DndProvider>
       </div>
 
+      {/* Sync status bar */}
+      {syncStatus && (
+        <div
+          className={`fixed bottom-0 left-0 right-0 glass-panel text-white text-xs px-4 py-1.5 text-center z-40 animate-[slideUp_200ms_ease-out,fadeIn_200ms_ease-out] ${
+            syncStatus.startsWith("Sync failed") ? "bg-danger/90" : "bg-accent/90"
+          }`}
+        >
+          {syncStatus}
+        </div>
+      )}
       {showAddAccount && (
         <AddAccount
           onClose={() => setShowAddAccount(false)}
