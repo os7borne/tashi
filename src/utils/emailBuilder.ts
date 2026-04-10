@@ -9,6 +9,7 @@ export interface EmailAttachment {
 
 export interface EmailDraft {
   from: string;
+  fromName?: string;
   to: string[];
   cc?: string[];
   bcc?: string[];
@@ -99,8 +100,11 @@ function generateMessageId(from: string): string {
 
 export function buildRawEmail(draft: EmailDraft): string {
   const messageId = generateMessageId(draft.from);
+  const fromHeader = draft.fromName
+    ? `${draft.fromName} <${draft.from}>`
+    : draft.from;
   const lines: string[] = [
-    `From: ${draft.from}`,
+    `From: ${fromHeader}`,
     `To: ${draft.to.join(", ")}`,
   ];
 

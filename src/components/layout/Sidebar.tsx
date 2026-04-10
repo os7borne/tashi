@@ -11,6 +11,8 @@ import { useContextMenuStore } from "@/stores/contextMenuStore";
 import { useSmartFolderStore } from "@/stores/smartFolderStore";
 import { useActiveLabel, useActiveCategory } from "@/hooks/useRouteNavigation";
 import { navigateToLabel } from "@/router/navigate";
+import { useRouterState } from "@tanstack/react-router";
+import { router } from "@/router/index";
 import {
   Inbox,
   Star,
@@ -40,6 +42,9 @@ import {
   Paperclip,
   FolderSearch,
   Loader2,
+  ContactRound,
+  Building2,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import { useTaskStore } from "@/stores/taskStore";
@@ -59,6 +64,7 @@ export const ALL_NAV_ITEMS: { id: string; label: string; icon: LucideIcon }[] = 
   { id: "spam", label: "Spam", icon: Ban },
   { id: "all", label: "All Mail", icon: Mail },
   { id: "tasks", label: "Tasks", icon: CheckSquare },
+  { id: "crm", label: "CRM", icon: ContactRound },
   { id: "calendar", label: "Calendar", icon: Calendar },
   { id: "attachments", label: "Attachments", icon: Paperclip },
   { id: "smart-folders", label: "Smart Folders", icon: FolderSearch },
@@ -71,6 +77,12 @@ const CATEGORY_ITEMS: { id: string; label: string; icon: LucideIcon }[] = [
   { id: "Promotions", label: "Promotions", icon: Tag },
   { id: "Social", label: "Social", icon: Users },
   { id: "Newsletters", label: "Newsletters", icon: Newspaper },
+];
+
+const CRM_SUB_ITEMS: { id: string; label: string; icon: LucideIcon; path: string }[] = [
+  { id: "crm-people", label: "People", icon: ContactRound, path: "/crm/people" },
+  { id: "crm-companies", label: "Companies", icon: Building2, path: "/crm/companies" },
+  { id: "crm-pipeline", label: "Pipeline", icon: Briefcase, path: "/crm/pipeline" },
 ];
 
 function DroppableNavItem({
@@ -213,6 +225,9 @@ export function Sidebar({ collapsed, onAddAccount }: SidebarProps) {
   const inboxViewMode = useUIStore((s) => s.inboxViewMode);
   const setInboxViewMode = useUIStore((s) => s.setInboxViewMode);
   const activeCategory = useActiveCategory();
+  const [crmExpanded] = useState(true);
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
   const openComposer = useComposerStore((s) => s.openComposer);
   const activeAccountId = useAccountStore((s) => s.activeAccountId);
   const labels = useLabelStore((s) => s.labels);
@@ -447,9 +462,35 @@ export function Sidebar({ collapsed, onAddAccount }: SidebarProps) {
                   })}
                 </div>
               )}
+
+              {/* CRM sub-items */}
+              {item.id === "crm" && crmExpanded && !collapsed && (
+                <div className="mt-1">
+                  {CRM_SUB_ITEMS.map((sub) => {
+                    const SubIcon = sub.icon;
+                    const isSubActive = currentPath === sub.path || (sub.path !== "/crm" && currentPath.startsWith(sub.path));
+                    return (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          router.navigate({ to: sub.path as any });
+                        }}
+                        className={`flex items-center gap-2 w-full py-1.5 pl-7 pr-3 text-left text-[0.8125rem] transition-colors ${
+                          isSubActive
+                            ? "text-accent font-medium"
+                            : "text-sidebar-text/70 hover:text-sidebar-text hover:bg-sidebar-hover"
+                        }`}
+                      >
+                        <SubIcon size={14} className="shrink-0" />
+                        <span className="flex-1 truncate">{sub.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
-        })}
+        })};
 
         {/* Smart Folders */}
         {showSmartFolders && (smartFolders.length > 0 || !collapsed) && (

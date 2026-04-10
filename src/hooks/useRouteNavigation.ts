@@ -34,6 +34,9 @@ export function useActiveLabel(): string {
     if (match.routeId === "/calendar") {
       return "calendar";
     }
+    if (match.routeId === "/crm" || match.pathname === "/crm") {
+      return "crm";
+    }
     if (match.routeId === "/help/$topic" || match.routeId === "/help") {
       return "help";
     }
@@ -57,6 +60,7 @@ export function useSelectedThreadId(): string | null {
 
 /**
  * Get the active category from search params (only relevant on inbox in split mode).
+ * Defaults to "All" to match unified inbox behavior.
  */
 export function useActiveCategory(): string {
   const matches = useMatchesSafe();
@@ -66,7 +70,7 @@ export function useActiveCategory(): string {
       return search["category"];
     }
   }
-  return "Primary";
+  return "All";
 }
 
 /**

@@ -31,6 +31,7 @@ import {
   type ThreadGroup,
 } from "../threading/threadBuilder";
 import { getPendingOpsForResource } from "../db/pendingOperations";
+import { autoAddContactsFromMessage, getAutoAddContactsSettings } from "../contacts/autoAddContacts";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -340,6 +341,25 @@ async function storeThreadsAndMessages(
         }
       }
     });
+  }
+
+  // Auto-add contacts from incoming messages (outside transaction)
+  try {
+    const contactSettings = await getAutoAddContactsSettings();
+    if (contactSettings.enabled) {
+      for (const msg of storedMessages) {
+        await autoAddContactsFromMessage({
+          fromAddress: msg.fromAddress,
+          fromName: msg.fromName,
+          toAddresses: msg.toAddresses,
+          ccAddresses: msg.ccAddresses,
+          bccAddresses: msg.bccAddresses,
+        }, contactSettings);
+      }
+    }
+  } catch (err) {
+    // Non-critical: log but don't fail sync
+    console.warn("[imapSync] Failed to auto-add contacts from message:", err);
   }
 
   return storedMessages;

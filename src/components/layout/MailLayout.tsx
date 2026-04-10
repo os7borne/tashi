@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback } from "react";
 import { EmailList } from "./EmailList";
 import { ReadingPane } from "./ReadingPane";
 import { Sidebar } from "./Sidebar";
@@ -7,42 +7,28 @@ import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 export function MailLayout() {
   const isReadingPaneOpen = useUIStore((s) => s.isReadingPaneOpen);
-  const setReadingPaneOpen = useUIStore((s) => s.setReadingPaneOpen);
   const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
 
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Escape or 'B' to go back to email list
-      if ((e.key === "Escape" || e.key === "b" || e.key === "B") && isReadingPaneOpen) {
-        e.preventDefault();
-        setReadingPaneOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isReadingPaneOpen, setReadingPaneOpen]);
-
-  const handleAddAccount = () => {
-    // Dispatch event to open add account modal (handled in App.tsx)
+  const handleAddAccount = useCallback(() => {
     window.dispatchEvent(new Event("velo-show-add-account"));
-  };
+  }, []);
 
   return (
-    <div className="flex flex-1 min-w-0 flex-row h-full">
+    <div className="flex flex-1 min-w-0 h-full">
       {/* Left column: Sidebar */}
       <Sidebar collapsed={sidebarCollapsed} onAddAccount={handleAddAccount} />
-      
-      {/* Right column: EmailList OR ReadingPane */}
+
+      {/* Main area: Email list OR Reading pane (email detail + AI sidebar) */}
       <div className="flex-1 min-w-0 h-full">
-        <ErrorBoundary name="EmailLayout">
-          {isReadingPaneOpen ? (
+        {isReadingPaneOpen ? (
+          <ErrorBoundary name="ReadingPane">
             <ReadingPane />
-          ) : (
+          </ErrorBoundary>
+        ) : (
+          <ErrorBoundary name="EmailList">
             <EmailList />
-          )}
-        </ErrorBoundary>
+          </ErrorBoundary>
+        )}
       </div>
     </div>
   );

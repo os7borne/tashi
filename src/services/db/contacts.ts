@@ -9,6 +9,11 @@ export interface DbContact {
   frequency: number;
   last_contacted_at: number | null;
   notes: string | null;
+  company_id: string | null;
+  relationship_type: string;
+  title: string | null;
+  battery_level: number;
+  battery_factors_json: string | null;
 }
 
 export interface ContactAttachment {

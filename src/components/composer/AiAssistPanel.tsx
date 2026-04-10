@@ -31,9 +31,19 @@ export function AiAssistPanel({ editor, isReplyMode, threadMessages }: AiAssistP
   if (available === null) return null;
   if (!available) return null;
 
+  const stripMarkdownFences = (text: string): string => {
+    // Strip markdown code fences like ```html, ```, etc.
+    return text
+      .replace(/^```[a-z]*\n/i, "")
+      .replace(/\n```$/i, "")
+      .replace(/^```[a-z]*$/i, "")
+      .trim();
+  };
+
   const applyToEditor = (html: string) => {
     if (!editor) return;
-    editor.chain().focus().setContent(html).run();
+    const cleaned = stripMarkdownFences(html);
+    editor.chain().focus().setContent(cleaned).run();
     setBodyHtml(editor.getHTML());
   };
 

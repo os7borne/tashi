@@ -2,6 +2,27 @@
 
 This document provides guidance for AI coding agents (Kimi, Claude, etc.) working on this repository.
 
+> **📚 Looking for comprehensive context?** Check the [`.context/`](.context/) folder for detailed documentation on:
+> - [Project Overview](.context/project/overview.md)
+> - [Architecture](.context/codebase/architecture.md)
+> - [Development Workflows](.context/development/workflows.md)
+> - [Coding Conventions](.context/codebase/conventions.md)
+
+## Quick Reference
+
+| Context | Location |
+|---------|----------|
+| **Project Overview** | [`.context/project/overview.md`](.context/project/overview.md) |
+| **Tech Stack** | [`.context/project/tech-stack.md`](.context/project/tech-stack.md) |
+| **Architecture** | [`.context/codebase/architecture.md`](.context/codebase/architecture.md) |
+| **Directory Structure** | [`.context/codebase/structure.md`](.context/codebase/structure.md) |
+| **Coding Conventions** | [`.context/codebase/conventions.md`](.context/codebase/conventions.md) |
+| **Development Setup** | [`.context/development/setup.md`](.context/development/setup.md) |
+| **Commands** | [`.context/development/commands.md`](.context/development/commands.md) |
+| **Testing** | [`.context/development/testing.md`](.context/development/testing.md) |
+| **Git Workflows** | [`.context/development/workflows.md`](.context/development/workflows.md) |
+| **Branding** | [`.context/project/branding.md`](.context/project/branding.md) |
+
 ## 🏗️ Repository Structure
 
 This is a **fork** of the Velo email client with custom branding. The repository uses a dual-branch strategy:

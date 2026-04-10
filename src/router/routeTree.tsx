@@ -15,9 +15,12 @@ const HelpPage = lazy(() => import("@/components/help/HelpPage").then((m) => ({ 
 const CalendarPage = lazy(() => import("@/components/calendar/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const TasksPage = lazy(() => import("@/components/tasks/TasksPage").then((m) => ({ default: m.TasksPage })));
 const AttachmentLibrary = lazy(() => import("@/components/attachments/AttachmentLibrary").then((m) => ({ default: m.AttachmentLibrary })));
+const PeoplePage = lazy(() => import("@/components/crm/PeoplePage").then((m) => ({ default: m.PeoplePage })));
+const CompaniesPage = lazy(() => import("@/components/crm/CompaniesPage").then((m) => ({ default: m.CompaniesPage })));
+const DealsPage = lazy(() => import("@/components/crm/DealsPage").then((m) => ({ default: m.DealsPage })));
 
 // ---------- Search param validation ----------
-const VALID_CATEGORIES = ["Primary", "Updates", "Promotions", "Social", "Newsletters"] as const;
+const VALID_CATEGORIES = ["All", "Primary", "Updates", "Promotions", "Social", "Newsletters"] as const;
 
 type MailSearch = {
   q?: string;
@@ -191,6 +194,72 @@ export const tasksRoute = createRoute({
   component: TasksPageWrapper,
 });
 
+// ---------- /crm ----------
+export const crmRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "crm",
+  beforeLoad: () => {
+    throw redirect({ to: "/crm/people" });
+  },
+});
+
+// ---------- /crm/people ----------
+function PeoplePageWrapper() {
+  return (
+    <PageLayout>
+      <ErrorBoundary name="PeoplePage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading people...</div>}>
+          <PeoplePage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
+  );
+}
+
+export const peopleRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "crm/people",
+  component: PeoplePageWrapper,
+});
+
+// ---------- /crm/companies ----------
+function CompaniesPageWrapper() {
+  return (
+    <PageLayout>
+      <ErrorBoundary name="CompaniesPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading companies...</div>}>
+          <CompaniesPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
+  );
+}
+
+export const companiesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "crm/companies",
+  component: CompaniesPageWrapper,
+});
+
+// ---------- /crm/pipeline ----------
+function DealsPageWrapper() {
+  return (
+    <PageLayout>
+      <ErrorBoundary name="DealsPage">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-text-tertiary text-sm">Loading pipeline...</div>}>
+          <DealsPage />
+        </Suspense>
+      </ErrorBoundary>
+    </PageLayout>
+  );
+}
+
+export const dealsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "crm/pipeline",
+  component: DealsPageWrapper,
+});
+
 // ---------- /calendar ----------
 export const calendarRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -224,6 +293,10 @@ export const routeTree = rootRoute.addChildren([
   settingsTabRoute,
   attachmentsRoute,
   tasksRoute,
+  crmRoute,
+  peopleRoute,
+  companiesRoute,
+  dealsRoute,
   calendarRoute,
   helpIndexRoute,
   helpTopicRoute,

@@ -186,6 +186,13 @@ export function Composer() {
     return () => { stopAutoSave(); };
   }, [isOpen, activeAccountId]);
 
+  // Set editor content when composer opens (e.g., for smart replies)
+  useEffect(() => {
+    if (isOpen && editor) {
+      editor.commands.setContent(useComposerStore.getState().bodyHtml);
+    }
+  }, [isOpen, editor]);
+
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     dragCounterRef.current++;
@@ -245,12 +252,14 @@ export function Composer() {
     const senderEmail = state.fromEmail ?? activeAccount.email;
     const raw = buildRawEmail({
       from: senderEmail,
+      fromName: activeAccount.displayName ?? undefined,
       to: state.to,
       cc: state.cc.length > 0 ? state.cc : undefined,
       bcc: state.bcc.length > 0 ? state.bcc : undefined,
       subject: state.subject,
       htmlBody: html,
       inReplyTo: state.inReplyToMessageId ?? undefined,
+      references: state.inReplyToMessageId ?? undefined,
       threadId: state.threadId ?? undefined,
       attachments: state.attachments.length > 0
         ? state.attachments.map((a) => ({

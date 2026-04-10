@@ -59,6 +59,8 @@ async function handlePopOut(thread: Thread) {
 
 export function ThreadView({ thread }: ThreadViewProps) {
   const activeAccountId = useAccountStore((s) => s.activeAccountId);
+  const accounts = useAccountStore((s) => s.accounts);
+  const activeAccount = accounts.find((a) => a.id === activeAccountId);
   const contactSidebarVisible = useUIStore((s) => s.contactSidebarVisible);
   const toggleContactSidebar = useUIStore((s) => s.toggleContactSidebar);
   const taskSidebarVisible = useUIStore((s) => s.taskSidebarVisible);
@@ -146,15 +148,26 @@ export function ThreadView({ thread }: ThreadViewProps) {
 
   const handleReplyAll = useCallback(() => {
     if (!lastMessage) return;
+    const myEmail = activeAccount?.email?.toLowerCase();
     const replyTo = lastMessage.reply_to ?? lastMessage.from_address;
     const allRecipients = new Set<string>();
     if (replyTo) allRecipients.add(replyTo);
     if (lastMessage.to_addresses) {
-      lastMessage.to_addresses.split(",").forEach((a) => allRecipients.add(a.trim()));
+      lastMessage.to_addresses.split(",").forEach((a) => {
+        const trimmed = a.trim();
+        if (trimmed && trimmed.toLowerCase() !== myEmail) {
+          allRecipients.add(trimmed);
+        }
+      });
     }
     const ccList: string[] = [];
     if (lastMessage.cc_addresses) {
-      lastMessage.cc_addresses.split(",").forEach((a) => ccList.push(a.trim()));
+      lastMessage.cc_addresses.split(",").forEach((a) => {
+        const trimmed = a.trim();
+        if (trimmed && trimmed.toLowerCase() !== myEmail) {
+          ccList.push(trimmed);
+        }
+      });
     }
     openComposer({
       mode: "replyAll",
@@ -165,7 +178,7 @@ export function ThreadView({ thread }: ThreadViewProps) {
       threadId: lastMessage.thread_id,
       inReplyToMessageId: lastMessage.id,
     });
-  }, [lastMessage, openComposer]);
+  }, [lastMessage, openComposer, activeAccount?.email]);
 
   const handleForward = useCallback(() => {
     if (!lastMessage) return;

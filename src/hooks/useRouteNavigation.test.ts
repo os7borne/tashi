@@ -115,21 +115,21 @@ describe("useRouteNavigation hooks", () => {
       expect(useActiveCategory()).toBe("Updates");
     });
 
-    it("should return 'Primary' when no category in search", () => {
+    it("should return 'All' when no category in search", () => {
       setMatches([
         { routeId: "/mail/$label", params: { label: "inbox" }, search: {} },
       ]);
-      expect(useActiveCategory()).toBe("Primary");
+      expect(useActiveCategory()).toBe("All");
     });
 
-    it("should return 'Primary' when no search params", () => {
+    it("should return 'All' when no search params", () => {
       setMatches([{ routeId: "/mail/$label", params: { label: "inbox" } }]);
-      expect(useActiveCategory()).toBe("Primary");
+      expect(useActiveCategory()).toBe("All");
     });
 
-    it("should return 'Primary' when no matches", () => {
+    it("should return 'All' when no matches", () => {
       setMatches([]);
-      expect(useActiveCategory()).toBe("Primary");
+      expect(useActiveCategory()).toBe("All");
     });
   });
 

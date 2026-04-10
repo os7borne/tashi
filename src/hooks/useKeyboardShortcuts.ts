@@ -225,9 +225,11 @@ async function executeAction(actionId: string): Promise<void> {
       }
       break;
     }
-    case "nav.goInbox":
-      navigateToLabel("inbox");
+    case "nav.goInbox": {
+      const inboxCategory = useUIStore.getState().inboxViewMode === "unified" ? "All" : "Primary";
+      navigateToLabel("inbox", { category: inboxCategory });
       break;
+    }
     case "nav.goStarred":
       navigateToLabel("starred");
       break;

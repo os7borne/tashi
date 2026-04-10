@@ -132,6 +132,8 @@ export function SettingsPage() {
   const [aiTestError, setAiTestError] = useState<string>("");
   const [aiAutoDraftEnabled, setAiAutoDraftEnabled] = useState(true);
   const [aiWritingStyleEnabled, setAiWritingStyleEnabled] = useState(true);
+  const [_composeFontSize, setComposeFontSize] = useState<"small" | "normal" | "large">("normal");
+  const [_composeFontFamily, setComposeFontFamily] = useState("system");
   const [styleAnalyzing, setStyleAnalyzing] = useState(false);
   const [styleAnalyzeDone, setStyleAnalyzeDone] = useState(false);
   const [useCustomPrompt, setUseCustomPrompt] = useState(false);
@@ -146,6 +148,11 @@ export function SettingsPage() {
   const [notifyCategories, setNotifyCategories] = useState<Set<string>>(() => new Set(["Primary"]));
   const [vipSenders, setVipSenders] = useState<{ email_address: string; display_name: string | null }[]>([]);
   const [newVipEmail, setNewVipEmail] = useState("");
+  const [autoAddContactsEnabled, setAutoAddContactsEnabled] = useState(true);
+  const [autoAddContactsIncludeCc, setAutoAddContactsIncludeCc] = useState(true);
+  const [autoAddContactsIncludeBcc, setAutoAddContactsIncludeBcc] = useState(false);
+  const [backfillStatus, setBackfillStatus] = useState<"idle" | "running" | "done">("idle");
+  const [backfillResult, setBackfillResult] = useState<{ added: number; errors: number } | null>(null);
 
   // Load settings from DB
   useEffect(() => {
@@ -209,6 +216,14 @@ export function SettingsPage() {
       const aiStyle = await getSetting("ai_writing_style_enabled");
       setAiWritingStyleEnabled(aiStyle !== "false");
 
+      // Load compose default settings
+      const composeFontSizeVal = await getSetting("compose_font_size");
+      if (composeFontSizeVal === "small" || composeFontSizeVal === "large") {
+        setComposeFontSize(composeFontSizeVal);
+      }
+      const composeFontFamilyVal = await getSetting("compose_font_family");
+      if (composeFontFamilyVal) setComposeFontFamily(composeFontFamilyVal);
+
       // Load custom system prompt settings
       const useCustom = await getSetting("ai_use_custom_prompt");
       setUseCustomPrompt(useCustom === "true");
@@ -238,6 +253,14 @@ export function SettingsPage() {
       } catch {
         // VIP table may not exist yet
       }
+
+      // Load auto-add contacts settings
+      const autoAddEnabled = await getSetting("auto_add_contacts_enabled");
+      setAutoAddContactsEnabled(autoAddEnabled !== "false");
+      const autoAddCc = await getSetting("auto_add_contacts_include_cc");
+      setAutoAddContactsIncludeCc(autoAddCc !== "false");
+      const autoAddBcc = await getSetting("auto_add_contacts_include_bcc");
+      setAutoAddContactsIncludeBcc(autoAddBcc === "true");
 
       // Load cache settings
       const cacheMax = await getSetting("attachment_cache_max_mb");
@@ -837,6 +860,89 @@ export function SettingsPage() {
 
               {activeTab === "people" && (
                 <>
+                  <Section title="Auto-Add Contacts">
+                    <p className="text-xs text-text-tertiary mb-3">
+                      Automatically add contacts from incoming emails during sync.
+                    </p>
+                    <ToggleRow
+                      label="Enable auto-add contacts"
+                      description="Add email senders to contacts when receiving emails"
+                      checked={autoAddContactsEnabled}
+                      onToggle={async () => {
+                        const newVal = !autoAddContactsEnabled;
+                        setAutoAddContactsEnabled(newVal);
+                        await setSetting("auto_add_contacts_enabled", newVal ? "true" : "false");
+                      }}
+                    />
+                    {autoAddContactsEnabled && (
+                      <>
+                        <div className="ml-6 mt-2 space-y-2">
+                          <ToggleRow
+                            label="Include CC recipients"
+                            description="Add CC'd contacts from incoming emails"
+                            checked={autoAddContactsIncludeCc}
+                            onToggle={async () => {
+                              const newVal = !autoAddContactsIncludeCc;
+                              setAutoAddContactsIncludeCc(newVal);
+                              await setSetting("auto_add_contacts_include_cc", newVal ? "true" : "false");
+                            }}
+                          />
+                          <ToggleRow
+                            label="Include BCC recipients"
+                            description="Add BCC'd contacts from incoming emails (may include hidden recipients)"
+                            checked={autoAddContactsIncludeBcc}
+                            onToggle={async () => {
+                              const newVal = !autoAddContactsIncludeBcc;
+                              setAutoAddContactsIncludeBcc(newVal);
+                              await setSetting("auto_add_contacts_include_bcc", newVal ? "true" : "false");
+                            }}
+                          />
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-border-primary">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="text-sm text-text-secondary">Backfill existing emails</span>
+                              <p className="text-xs text-text-tertiary mt-0.5">
+                                Scan existing messages and add contacts from them
+                              </p>
+                            </div>
+                            <Button
+                              variant="secondary"
+                              onClick={async () => {
+                                setBackfillStatus("running");
+                                try {
+                                  const { backfillContactsFromExistingMessages } = await import("@/services/contacts/backfillContacts");
+                                  const activeAccount = accounts.find((a) => a.isActive && a.provider !== "caldav");
+                                  if (activeAccount) {
+                                    const result = await backfillContactsFromExistingMessages(activeAccount.id, (progress) => {
+                                      console.log(`Backfill progress: ${progress.current}/${progress.total}`);
+                                    });
+                                    setBackfillResult(result);
+                                    setBackfillStatus("done");
+                                  } else {
+                                    setBackfillStatus("idle");
+                                  }
+                                } catch (err) {
+                                  console.error("Backfill failed:", err);
+                                  setBackfillStatus("idle");
+                                }
+                              }}
+                              disabled={backfillStatus === "running"}
+                              className="bg-bg-tertiary text-text-primary border border-border-primary"
+                            >
+                              {backfillStatus === "running" ? "Running..." : "Backfill"}
+                            </Button>
+                          </div>
+                          {backfillStatus === "done" && backfillResult && (
+                            <p className="text-xs text-success mt-2">
+                              Backfill complete! Added {backfillResult.added} contacts.
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </Section>
+
                   <Section title="Contacts">
                     <p className="text-xs text-text-tertiary mb-3">
                       Contacts are automatically added when you send or receive emails. Edit display names or remove contacts below.

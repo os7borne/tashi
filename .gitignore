@@ -77,3 +77,8 @@ velo-*.tar.gz
 *.flatpak
 *.rpm
 *.src.rpm
+
+
+.context 
+.zed 
+.claude 

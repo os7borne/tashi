@@ -12,6 +12,7 @@ import { getMutedThreadIds } from "../db/threads";
 import { getThreadCategory } from "../db/threadCategories";
 import { getVipSenders } from "../db/notificationVips";
 import { getPendingOpsForResource } from "../db/pendingOperations";
+import { autoAddContactsFromMessage, getAutoAddContactsSettings } from "../contacts/autoAddContacts";
 
 async function loadAutoArchiveCategories(): Promise<Set<string>> {
   const raw = await getSetting("auto_archive_categories");
@@ -149,6 +150,25 @@ async function processAndStoreThread(
       }),
     ));
   }));
+
+  // Auto-add contacts from incoming messages
+  try {
+    const contactSettings = await getAutoAddContactsSettings();
+    if (contactSettings.enabled) {
+      for (const msg of parsedMessages) {
+        await autoAddContactsFromMessage({
+          fromAddress: msg.fromAddress,
+          fromName: msg.fromName,
+          toAddresses: msg.toAddresses,
+          ccAddresses: msg.ccAddresses,
+          bccAddresses: msg.bccAddresses,
+        }, contactSettings);
+      }
+    }
+  } catch (err) {
+    // Non-critical: log but don't fail sync
+    console.warn("Failed to auto-add contacts from message:", err);
+  }
 }
 
 /**

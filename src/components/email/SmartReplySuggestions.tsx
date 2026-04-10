@@ -5,6 +5,7 @@ import { generateSmartReplies } from "@/services/ai/aiService";
 import { deleteAiCache } from "@/services/db/aiCache";
 import { useComposerStore } from "@/stores/composerStore";
 import type { DbMessage } from "@/services/db/messages";
+import { escapeHtml, sanitizeHtml } from "@/utils/sanitize";
 
 interface SmartReplySuggestionsProps {
   threadId: string;
@@ -71,11 +72,20 @@ export function SmartReplySuggestions({ threadId, accountId, messages, noReply }
       mode: "reply",
       to: replyTo ? [replyTo] : [],
       subject: `Re: ${lastMessage.subject ?? ""}`,
-      bodyHtml: `<p>${replyText}</p>`,
+      bodyHtml: `<p>${replyText}</p>${buildQuote(lastMessage)}`,
       threadId: lastMessage.thread_id,
       inReplyToMessageId: lastMessage.id,
     });
   }, [messages, openComposer]);
+
+function buildQuote(msg: DbMessage): string {
+  const date = new Date(msg.date).toLocaleString();
+  const from = msg.from_name
+    ? `${escapeHtml(msg.from_name)} &lt;${escapeHtml(msg.from_address ?? "")}&gt;`
+    : escapeHtml(msg.from_address ?? "Unknown");
+  const body = msg.body_html ? sanitizeHtml(msg.body_html) : escapeHtml(msg.body_text ?? "");
+  return `<br><br><div style="border-left:2px solid #ccc;padding-left:12px;margin-left:0;color:#666">On ${date}, ${from} wrote:<br>${body}</div>`;
+}
 
   if (!available || messages.length === 0 || noReply) return null;
 

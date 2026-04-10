@@ -2,6 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+> **📚 Comprehensive context available in [`.context/`](./.context/) folder:**
+> - [Project Overview](./.context/project/overview.md) - What Tashi is
+> - [Architecture](./.context/codebase/architecture.md) - Three-layer architecture
+> - [Structure](./.context/codebase/structure.md) - Directory structure
+> - [Conventions](./.context/codebase/conventions.md) - Coding standards
+> - [Development](./.context/development/) - Setup, commands, testing
+
+## Quick Links
+
+| Topic | File |
+|-------|------|
+| Project Info | [`./.context/project/overview.md`](./.context/project/overview.md) |
+| Tech Stack | [`./.context/project/tech-stack.md`](./.context/project/tech-stack.md) |
+| Frontend | [`./.context/codebase/frontend.md`](./.context/codebase/frontend.md) |
+| Backend | [`./.context/codebase/backend.md`](./.context/codebase/backend.md) |
+| Database | [`./.context/codebase/database.md`](./.context/codebase/database.md) |
+| Workflows | [`./.context/development/workflows.md`](./.context/development/workflows.md) |
+
+---
+
 ## Commands
 
 ```bash

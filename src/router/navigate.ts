@@ -1,9 +1,20 @@
 import { router } from "./index";
+import { useUIStore } from "@/stores/uiStore";
 
 /** Known system labels that map to /mail/$label */
 const SYSTEM_LABELS = new Set([
   "inbox", "starred", "snoozed", "sent", "drafts", "trash", "spam", "all",
 ]);
+
+/**
+ * Get the default category based on current inbox view mode.
+ * Used when navigating to inbox without an explicit category.
+ */
+function getDefaultCategory(): "All" | "Primary" {
+  // Access the store directly to avoid React hook rules issues
+  const state = useUIStore.getState();
+  return state.inboxViewMode === "unified" ? "All" : "Primary";
+}
 
 /**
  * Navigate to a label/view. Handles routing for system labels, custom labels,
@@ -25,6 +36,21 @@ export function navigateToLabel(
 
   if (label === "attachments") {
     router.navigate({ to: "/attachments" });
+    return;
+  }
+
+  if (label === "crm") {
+    router.navigate({ to: "/crm" });
+    return;
+  }
+
+  if (label === "crm-companies") {
+    router.navigate({ to: "/crm/companies" });
+    return;
+  }
+
+  if (label === "crm-pipeline") {
+    router.navigate({ to: "/crm/pipeline" });
     return;
   }
 
@@ -56,7 +82,12 @@ export function navigateToLabel(
 
   if (SYSTEM_LABELS.has(label)) {
     const search: Record<string, string> = {};
-    if (opts?.category) search["category"] = opts.category;
+    // Always set category for inbox to ensure consistent navigation
+    if (label === "inbox") {
+      search["category"] = opts?.category ?? getDefaultCategory();
+    } else if (opts?.category) {
+      search["category"] = opts.category;
+    }
     if (opts?.threadId) {
       router.navigate({
         to: "/mail/$label/thread/$threadId",
@@ -94,14 +125,20 @@ export function navigateToLabel(
 export function navigateToThread(threadId: string): void {
   const { location } = router.state;
   const pathname = location.pathname;
+  const search = { ...(location.search as Record<string, string>) };
 
   // Already on a mail/$label route
   const mailMatch = pathname.match(/^\/mail\/([^/]+)/);
   if (mailMatch) {
+    const label = mailMatch[1]!;
+    // Ensure category is set for inbox
+    if (label === "inbox" && !search["category"]) {
+      search["category"] = getDefaultCategory();
+    }
     router.navigate({
       to: "/mail/$label/thread/$threadId",
-      params: { label: mailMatch[1]!, threadId },
-      search: location.search as Record<string, string>,
+      params: { label, threadId },
+      search,
     });
     return;
   }
@@ -112,7 +149,7 @@ export function navigateToThread(threadId: string): void {
     router.navigate({
       to: "/label/$labelId/thread/$threadId",
       params: { labelId: labelMatch[1]!, threadId },
-      search: location.search as Record<string, string>,
+      search,
     });
     return;
   }
@@ -123,7 +160,7 @@ export function navigateToThread(threadId: string): void {
     router.navigate({
       to: "/smart-folder/$folderId/thread/$threadId",
       params: { folderId: sfMatch[1]!, threadId },
-      search: location.search as Record<string, string>,
+      search,
     });
     return;
   }
@@ -132,6 +169,7 @@ export function navigateToThread(threadId: string): void {
   router.navigate({
     to: "/mail/$label/thread/$threadId",
     params: { label: "inbox", threadId },
+    search: { category: getDefaultCategory() },
   });
 }
 
@@ -155,14 +193,20 @@ export function navigateToHelp(topic = "getting-started"): void {
 export function navigateBack(): void {
   const { location } = router.state;
   const pathname = location.pathname;
+  const search = { ...(location.search as Record<string, string>) };
 
   // If on a thread sub-route, go to parent
   const mailThreadMatch = pathname.match(/^\/mail\/([^/]+)\/thread\//);
   if (mailThreadMatch) {
+    const label = mailThreadMatch[1]!;
+    // Ensure category is set for inbox
+    if (label === "inbox" && !search["category"]) {
+      search["category"] = getDefaultCategory();
+    }
     router.navigate({
       to: "/mail/$label",
-      params: { label: mailThreadMatch[1]! },
-      search: location.search as Record<string, string>,
+      params: { label },
+      search,
     });
     return;
   }
@@ -172,7 +216,7 @@ export function navigateBack(): void {
     router.navigate({
       to: "/label/$labelId",
       params: { labelId: labelThreadMatch[1]! },
-      search: location.search as Record<string, string>,
+      search,
     });
     return;
   }
@@ -182,13 +226,17 @@ export function navigateBack(): void {
     router.navigate({
       to: "/smart-folder/$folderId",
       params: { folderId: sfThreadMatch[1]! },
-      search: location.search as Record<string, string>,
+      search,
     });
     return;
   }
 
-  // Not on a thread route — navigate to inbox
-  router.navigate({ to: "/mail/$label", params: { label: "inbox" } });
+  // Not on a thread route — navigate to inbox with appropriate category
+  router.navigate({
+    to: "/mail/$label",
+    params: { label: "inbox" },
+    search: { category: getDefaultCategory() },
+  });
 }
 
 /**
@@ -214,6 +262,15 @@ export function getActiveLabel(): string {
     }
     if (match.routeId === "/tasks") {
       return "tasks";
+    }
+    if (match.routeId === "/crm" || match.pathname === "/crm") {
+      return "crm";
+    }
+    if (match.routeId === "/crm/companies" || match.pathname === "/crm/companies") {
+      return "crm";
+    }
+    if (match.routeId === "/crm/pipeline" || match.pathname === "/crm/pipeline") {
+      return "crm";
     }
     if (match.routeId === "/calendar") {
       return "calendar";

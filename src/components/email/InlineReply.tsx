@@ -19,6 +19,7 @@ import {
 } from "@/services/ai/writingStyleService";
 import type { DbMessage } from "@/services/db/messages";
 import type { Thread } from "@/stores/threadStore";
+import { escapeHtml, sanitizeHtml } from "@/utils/sanitize";
 
 type ReplyMode = "reply" | "replyAll" | "forward";
 
@@ -171,8 +172,14 @@ export function InlineReply({ thread, messages, accountId, noReply, onSent }: In
         html += `<div style="margin-top:16px;border-top:1px solid #e5e5e5;padding-top:12px">${signatureHtml}</div>`;
       }
 
+      // Append quoted original message for reply/replyAll (not forward)
+      if (mode !== "forward" && lastMessage) {
+        html += buildQuote(lastMessage);
+      }
+
       const raw = buildRawEmail({
         from: activeAccount.email,
+        fromName: activeAccount.displayName ?? undefined,
         to,
         cc: cc.length > 0 ? cc : undefined,
         subject: getSubject(),
@@ -434,4 +441,13 @@ export function InlineReply({ thread, messages, accountId, noReply, onSent }: In
       </div>
     </div>
   );
+}
+
+function buildQuote(msg: DbMessage): string {
+  const date = new Date(msg.date).toLocaleString();
+  const from = msg.from_name
+    ? `${escapeHtml(msg.from_name)} &lt;${escapeHtml(msg.from_address ?? "")}&gt;`
+    : escapeHtml(msg.from_address ?? "Unknown");
+  const body = msg.body_html ? sanitizeHtml(msg.body_html) : escapeHtml(msg.body_text ?? "");
+  return `<br><br><div style="border-left:2px solid #ccc;padding-left:12px;margin-left:0;color:#666">On ${date}, ${from} wrote:<br>${body}</div>`;
 }

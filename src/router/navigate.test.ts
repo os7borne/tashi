@@ -38,7 +38,7 @@ describe("navigate", () => {
       expect(mockNavigate).toHaveBeenCalledWith({
         to: "/mail/$label",
         params: { label: "inbox" },
-        search: {},
+        search: { category: "All" },
       });
     });
 
@@ -122,7 +122,7 @@ describe("navigate", () => {
       expect(mockNavigate).toHaveBeenCalledWith({
         to: "/mail/$label/thread/$threadId",
         params: { label: "inbox", threadId: "thread-abc" },
-        search: {},
+        search: { category: "All" },
       });
     });
 
@@ -152,6 +152,7 @@ describe("navigate", () => {
       expect(mockNavigate).toHaveBeenCalledWith({
         to: "/mail/$label/thread/$threadId",
         params: { label: "inbox", threadId: "thread-abc" },
+        search: { category: "All" },
       });
     });
 
@@ -193,7 +194,7 @@ describe("navigate", () => {
       expect(mockNavigate).toHaveBeenCalledWith({
         to: "/mail/$label",
         params: { label: "inbox" },
-        search: {},
+        search: { category: "All" },
       });
     });
 
@@ -225,6 +226,7 @@ describe("navigate", () => {
       expect(mockNavigate).toHaveBeenCalledWith({
         to: "/mail/$label",
         params: { label: "inbox" },
+        search: { category: "All" },
       });
     });
 

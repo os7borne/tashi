@@ -775,6 +775,116 @@ const MIGRATIONS = [
     description: "Accept self-signed certificates for IMAP/SMTP",
     sql: `ALTER TABLE accounts ADD COLUMN accept_invalid_certs INTEGER DEFAULT 0;`,
   },
+  {
+    version: 24,
+    description: "Auto-add contacts from incoming emails",
+    sql: `
+      INSERT OR IGNORE INTO settings (key, value) VALUES 
+        ('auto_add_contacts_enabled', 'true'),
+        ('auto_add_contacts_include_cc', 'true'),
+        ('auto_add_contacts_include_bcc', 'false');
+    `,
+  },
+  {
+    version: 25,
+    description: "VC CRM: Companies, extended contacts, investment pipeline",
+    sql: `
+      -- ============================================
+      -- Companies Table
+      -- ============================================
+      CREATE TABLE IF NOT EXISTS companies (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        domain TEXT,
+        company_type TEXT DEFAULT 'other',
+        website TEXT,
+        description TEXT,
+        location TEXT,
+        linkedin_url TEXT,
+        crunchbase_url TEXT,
+        employee_count TEXT,
+        funding_stage TEXT,
+        total_funding TEXT,
+        valuation TEXT,
+        is_portfolio_company INTEGER DEFAULT 0,
+        is_target INTEGER DEFAULT 0,
+        notes TEXT,
+        created_at INTEGER DEFAULT (unixepoch()),
+        updated_at INTEGER DEFAULT (unixepoch())
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_companies_name ON companies(name);
+      CREATE INDEX IF NOT EXISTS idx_companies_domain ON companies(domain);
+      CREATE INDEX IF NOT EXISTS idx_companies_type ON companies(company_type);
+      CREATE INDEX IF NOT EXISTS idx_companies_funding_stage ON companies(funding_stage);
+      CREATE INDEX IF NOT EXISTS idx_companies_portfolio ON companies(is_portfolio_company);
+      CREATE INDEX IF NOT EXISTS idx_companies_target ON companies(is_target);
+
+      -- ============================================
+      -- Extend Contacts Table for VC CRM
+      -- ============================================
+      ALTER TABLE contacts ADD COLUMN company_id TEXT REFERENCES companies(id);
+      ALTER TABLE contacts ADD COLUMN relationship_type TEXT DEFAULT 'other';
+      ALTER TABLE contacts ADD COLUMN title TEXT;
+      ALTER TABLE contacts ADD COLUMN battery_level INTEGER DEFAULT 50;
+      ALTER TABLE contacts ADD COLUMN battery_factors_json TEXT;
+
+      CREATE INDEX IF NOT EXISTS idx_contacts_company ON contacts(company_id);
+      CREATE INDEX IF NOT EXISTS idx_contacts_relationship ON contacts(relationship_type);
+      CREATE INDEX IF NOT EXISTS idx_contacts_battery ON contacts(battery_level DESC);
+
+      -- ============================================
+      -- Investment Opportunities (Deals) Table
+      -- ============================================
+      CREATE TABLE IF NOT EXISTS investment_opportunities (
+        id TEXT PRIMARY KEY,
+        company_id TEXT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+        deal_name TEXT NOT NULL,
+        stage TEXT DEFAULT 'sourced',
+        deal_type TEXT DEFAULT 'new_investment',
+        check_size_min INTEGER,
+        check_size_max INTEGER,
+        valuation TEXT,
+        equity_percentage REAL,
+        priority TEXT DEFAULT 'medium',
+        source TEXT,
+        source_contact_id TEXT REFERENCES contacts(id),
+        next_step TEXT,
+        next_step_date INTEGER,
+        decision_date INTEGER,
+        memo TEXT,
+        thesis_fit TEXT,
+        risks TEXT,
+        status TEXT DEFAULT 'active',
+        passed_reason TEXT,
+        created_at INTEGER DEFAULT (unixepoch()),
+        updated_at INTEGER DEFAULT (unixepoch())
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_deals_company ON investment_opportunities(company_id);
+      CREATE INDEX IF NOT EXISTS idx_deals_stage ON investment_opportunities(stage);
+      CREATE INDEX IF NOT EXISTS idx_deals_status ON investment_opportunities(status);
+      CREATE INDEX IF NOT EXISTS idx_deals_priority ON investment_opportunities(priority);
+      CREATE INDEX IF NOT EXISTS idx_deals_source ON investment_opportunities(source_contact_id);
+      CREATE INDEX IF NOT EXISTS idx_deals_dates ON investment_opportunities(decision_date, next_step_date);
+
+      -- ============================================
+      -- Deal Activity Log (for pipeline history)
+      -- ============================================
+      CREATE TABLE IF NOT EXISTS deal_activities (
+        id TEXT PRIMARY KEY,
+        deal_id TEXT NOT NULL REFERENCES investment_opportunities(id) ON DELETE CASCADE,
+        activity_type TEXT NOT NULL,
+        description TEXT,
+        old_value TEXT,
+        new_value TEXT,
+        created_at INTEGER DEFAULT (unixepoch())
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_activities_deal ON deal_activities(deal_id);
+      CREATE INDEX IF NOT EXISTS idx_activities_date ON deal_activities(created_at DESC);
+    `,
+  },
 ];
 
 /**
